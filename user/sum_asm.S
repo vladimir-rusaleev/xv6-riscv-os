@@ -8,6 +8,7 @@ msg_result:  .asciz "Сумма: %d\n"
 no_first_msg:.asciz "Нет первого числа"
 no_second_msg: .asciz "Нет второго числа"
 overflow_msg: .asciz "Слишком большая суммарная длина чисел"
+many_spaces_msg: .asciz "Слишком много пробелов"
 buf:      .space BUF_SIZE
 
 .text
@@ -64,6 +65,7 @@ replace_space:
 	
 	lbu t1, (a1)
 	beq t1, zero, error_no_second
+	beq t1, t0, error_many_spaces
 	
 	la a0, buf
 	call atoi
@@ -102,6 +104,14 @@ error_overflow:
         li a0, 2
         la a1, msg_error
         la a2, overflow_msg
+        call fprintf
+        li a7, 2
+        li a0, 1
+        ecall
+error_many_spaces:
+        li a0, 2
+        la a1, msg_error
+        la a2, many_spaces_msg
         call fprintf
         li a7, 2
         li a0, 1
