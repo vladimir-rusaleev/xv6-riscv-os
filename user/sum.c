@@ -62,24 +62,13 @@ main()
 	}
 
 	int x, y;
-	int sign1 = 1, sign2 = 1;
-	
-	fst = first;
-	if(first[0] == '-')
-	{
-		sign1 = -1;
-		fst++;
-	}
-	x = atoi(fst) * sign1;
-	
-	snd = second;
-	if(second[0] == '-') {
-		sign2 = -1;
-		snd++;
-	}
-	y = atoi(snd) * sign2;
 
-	printf("%d + %d = %d\n", x, y, x + y);
+	x = atoi(first);
+	y = atoi(second);
+
+	int ans = add(x, y);
+
+	printf("%d + %d = %d\n", x, y, ans);
 
 	exit(0);
 }
