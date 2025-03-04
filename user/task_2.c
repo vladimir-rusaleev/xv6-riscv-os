@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 	else{
 		close(pipefd[0]);
 
-        	char buf[BUF_SIZE];
+		char buf[BUF_SIZE];
 		int i, len, len_to_be_written, ptr = 0;
 		for(i = 0; i < argc; ++i){
 			len = strlen(argv[i]);
@@ -58,11 +58,11 @@ int main(int argc, char *argv[]) {
 
 			if(len > BUF_SIZE){
 				int ret = write(pipefd[1], argv[i], len);
-                                if( ret < 0){
-                                        fprintf(2, "Ошибка вывода данных\n");
+				if( ret < 0){
+					fprintf(2, "Ошибка вывода данных\n");
 					close(pipefd[1]);
-                                        exit(1);
-                                }
+					exit(1);
+				}
 			}
 			else{
 				memmove(buf + ptr, argv[i], len);
@@ -77,14 +77,14 @@ int main(int argc, char *argv[]) {
 				close(pipefd[1]);
 				exit(1);
 			}
-        	}
+		}
 
-        	if( close(pipefd[1]) < 0){
+		if( close(pipefd[1]) < 0){
 			fprintf(2, "Ошибка закрытия пайпа\n");
 			exit(1);
 		}
 
-        	wait(0);
+		wait(0);
 		exit(0);
 	}
 }
