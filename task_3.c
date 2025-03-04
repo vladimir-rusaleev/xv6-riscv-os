@@ -8,13 +8,13 @@
 
 int main(int argc, char* argv[]) {
 	int pipefd[2];
-	if (pipe(pipefd) == -1) {
+	if (pipe(pipefd) < 0) {
 		fprintf(stderr, "Ошибка при создании pipe\n");
 		exit(1);
 	}
 
 	int pid = fork();
-	if (pid == -1) {
+	if (pid < 0) {
 		fprintf(stderr, "Ошибка при создании процесса\n");
 		exit(1);
 	}
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
 
 				while (len_to_be_written > 0) {
 					int ret = write(pipefd[1], buf + ptr, len_to_be_written);
-					if (ret == -1) {
+					if (ret < 0) {
 						fprintf(stderr, "Ошибка вывода данных\n");
 						close(pipefd[1]);
 						exit(1);
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 
 			if (len > BUF_SIZE) {
 				int ret = write(pipefd[1], argv[i], len);
-				if (ret == -1) {
+				if (ret < 0) {
 					fprintf(stderr, "Ошибка вывода данных\n");
 					close(pipefd[1]);
 					exit(1);
@@ -89,14 +89,14 @@ int main(int argc, char* argv[]) {
 			ptr++;
 		}
 		if (ptr > 0) {
-			if (write(pipefd[1], buf, ptr) == -1) {
+			if (write(pipefd[1], buf, ptr) < 0) {
 				fprintf(stderr, "Ошибка вывода данных\n");
 				close(pipefd[1]);
 				exit(1);
 			}
 		}
 
-		if (close(pipefd[1]) == -1) {
+		if (close(pipefd[1]) < 0) {
 			fprintf(stderr, "Ошибка закрытия пайпа\n");
 			close(pipefd[1]);
 			exit(1);

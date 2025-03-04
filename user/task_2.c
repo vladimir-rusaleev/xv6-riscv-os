@@ -6,13 +6,13 @@
 
 int main(int argc, char *argv[]) {
 	int pipefd[2];
-	if (pipe(pipefd) == -1) {
+	if (pipe(pipefd) < 0) {
 		fprintf(2, "Ошибка при создании pipe");
 		exit(1);
 	}
 	
 	int pid = fork();
-	if(pid == -1){
+	if(pid < 0){
 		fprintf(2, "Ошибка при создании процесса\n");
 		exit(1);
 	}
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 		close(pipefd[0]);
 
 		char *args[] = {"/wc", 0};
-		if( exec("/wc", args) == -1){
+		if( exec("/wc", args) < 0){
 			fprintf(2, "Ошибка вызова wc\n");
 			exit(1);
 		}
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
 				while(len_to_be_written > 0){
 					int ret = write(pipefd[1], buf, len_to_be_written);
-					if( ret == -1){
+					if( ret < 0){
 						fprintf(2, "Ошибка вывода данных\n");
 						close(pipefd[1]);
 						exit(1);
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
 			if(len > BUF_SIZE){
 				int ret = write(pipefd[1], argv[i], len);
-                                if( ret == -1){
+                                if( ret < 0){
                                         fprintf(2, "Ошибка вывода данных\n");
 					close(pipefd[1]);
                                         exit(1);
@@ -72,14 +72,14 @@ int main(int argc, char *argv[]) {
 			ptr++;
 		}
 		if (ptr > 0) {
-			if( write(pipefd[1], buf, ptr) == -1){
+			if( write(pipefd[1], buf, ptr) < 0){
 				fprintf(2, "Ошибка вывода данных\n");
 				close(pipefd[1]);
 				exit(1);
 			}
         	}
 
-        	if( close(pipefd[1]) == -1){
+        	if( close(pipefd[1]) < 0){
 			fprintf(2, "Ошибка закрытия пайпа\n");
 			exit(1);
 		}

@@ -4,6 +4,10 @@
 
 int main(){
 	int pid = fork();
+	if(pid < 0){
+                fprintf(2, "Ошибка при создании процесса\n");
+                exit(1);
+        }
 	if(pid == 0){
 		sleep(100);
 		exit(1);

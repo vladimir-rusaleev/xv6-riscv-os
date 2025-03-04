@@ -4,6 +4,10 @@
 
 int main(){
         int pid = fork();
+	if(pid < 0){
+                fprintf(2, "Ошибка при создании процесса\n");
+                exit(1);
+        }
         if(pid == 0){
                 sleep(100);
                 exit(1);
@@ -12,7 +16,7 @@ int main(){
 		int parent_pid = getpid();
                 printf("pid родителя = %d, pid ребенка = %d\n", parent_pid, pid);
 
-		if(kill(pid) == -1){
+		if(kill(pid) < 0){
 			fprintf(2, "Ошибка kill\n");
 		}
 
