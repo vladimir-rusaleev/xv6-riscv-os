@@ -5,7 +5,7 @@
 msg_string:  .asciz "|%s|\n"
 msg_error:   .asciz "Ошибка: %s\n"
 msg_result:  .asciz "Сумма: %d\n"
-no_first_msg:.asciz "Нет первого числа"
+no_first_msg:.asciz "Нет первого числа либо строка начинается с пробела"
 no_second_msg: .asciz "Нет второго числа"
 overflow_msg: .asciz "Слишком большая суммарная длина чисел"
 many_spaces_msg: .asciz "Слишком много пробелов"
@@ -28,6 +28,11 @@ main:
 	addi t2, t2, 1
         beq t1, t0, error_no_first
 
+	beq t1, zero, error_no_first
+
+	li t0, '\n'
+	beq t1, t0, error_no_first
+
 	la a1, buf
 	li t0, '\n'
 
@@ -43,15 +48,13 @@ find_newline:
 replace:
 	sb zero, (a1)
 
-	la a0, msg_string
-	la a1, buf
-	call printf
-
 split:
+	la a0, msg_string
+        la a1, buf
+        call printf
+
 	la a1, buf
 	li t0, ' '
-
-
 find_space:
 	lbu t1, (a1)
 	beq t1, t0, replace_space

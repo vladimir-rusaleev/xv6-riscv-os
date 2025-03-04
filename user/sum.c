@@ -10,61 +10,61 @@ main()
 	int i = 0;
 	int res, c;
 
-	for(i=0; i+1 < BUF_SIZE; ){
+	for(i=0; i < BUF_SIZE; i++){
 		res = read(0, &c, 1);
 		if(res < 1)
 			break;
-		buf[i++] = c;
-		if(c == '\n' || c == '\r')
+		buf[i] = c;
+		if(c == '\n')
 			break;
 	}
 	if (res < 0) {
 		fprintf(2,"%s\n", "Ошибка чтения");
 		exit(1);
 	}
-	if (buf[i-1] != '\n'){
+	if (i == BUF_SIZE && buf[BUF_SIZE - 1] != '\n'){
 		fprintf(2, "%s\n", "Слишком большая суммарная длина чисел");
 		exit(1);
 	}
 
-	buf[i-1] = '\0';
+	buf[i] = '\0';
 
 	printf("|%s|\n", buf);
 	
 	char* ptr = buf;
-	char first[BUF_SIZE], second[BUF_SIZE];
-	char* fst = first; 
-	char* snd = second;
+	char* fst = buf;
+
 	while(*ptr != ' ' && *ptr != '\0')
 	{
 		if(*ptr < '0' || *ptr > '9'){
 			fprintf(2, "%s\n", "Это не число");
 			exit(1);
 		}
-		*fst++ = *ptr++;
+		ptr++;
 	}
-	if (strlen(first) == 0){
-		fprintf(2, "%s\n", "Первого числа нет");
+	if (fst == ptr){
+		fprintf(2, "%s\n", "Первого числа нет либо строка начинается с пробела");
 		exit(1);
 	}
+	if( *ptr == ' '){
+		*ptr++ = '\0';
+	}
+
+	int x = atoi(fst);
 	
-	ptr++;
+	char* snd = ptr;
 	while(*ptr != ' ' && *ptr != '\0'){
 		if(*ptr < '0' || *ptr > '9'){
                         fprintf(2, "%s\n", "Это не число");
                         exit(1);
                 }
-		*snd++ = *ptr++;
+		ptr++;
 	}
-	if( strlen(second) == 0){
-		fprintf(2, "%s\n", "Второго числа нет");
+	if( snd == ptr){
+		fprintf(2, "%s\n", "Второго числа нет либо между числами больше одного пробела");
 		exit(1);
 	}
-
-	int x, y;
-
-	x = atoi(first);
-	y = atoi(second);
+	int y = atoi(snd);
 
 	int ans = add(x, y);
 
