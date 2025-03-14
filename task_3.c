@@ -9,20 +9,23 @@
 int main(int argc, char* argv[]) {
 	int pipefd[2];
 	if (pipe(pipefd) < 0) {
-		fprintf(stderr, "Ошибка при создании pipe\n");
+		perror("Ошибка при создании pipe\n");
 		exit(1);
 	}
 
 	int pid = fork();
 	if (pid < 0) {
-		fprintf(stderr, "Ошибка при создании процесса\n");
+		perror("Ошибка при создании процесса\n");
 		exit(1);
 	}
 	else if (pid == 0) {
-		close(pipefd[1]);
+		if(close(pipefd[1]) < 0) {
+			perror("Ошибка закрытия pipe\n");
+			exit(1);
+		}
 
 		char read_buf[BUF_SIZE];
-		int len_read, len_written, res;
+		ssize_t len_read, len_written, res;
 
 		while ((len_read = read(pipefd[0], read_buf, BUF_SIZE)) > 0) {
 			len_written = 0;
@@ -31,7 +34,7 @@ int main(int argc, char* argv[]) {
 				res = write(1, read_buf + len_written, len_read - len_written);
 
 				if (res < 0) {
-					fprintf(stderr, "Ошибка при выводе данных\n");
+					perror("Ошибка при выводе данных\n");
 					close(pipefd[0]);
 					exit(1);
 				}
@@ -40,69 +43,57 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		if (len_read < 0) {
-			fprintf(stderr, "Ошибка при чтении из файла\n");
+			perror("Ошибка при чтении из файла\n");
 			close(pipefd[0]);
 			exit(1);
 		}
 
-		close(pipefd[0]);
+		if(close(pipefd[0]) < 0){
+			perror("Ошибка закрытия pipe\n");
+			exit(1);
+		}
+
 		exit(0);
 	}
 	else {
-		close(pipefd[0]);
+		if(close(pipefd[0]) < 0){
+			perror("Ошибка закрытия pipe\n");
+			exit(1);
+		}
 
-		char buf[BUF_SIZE];
-		int i, len, len_to_be_written, ptr = 0;
-		for (i = 0; i < argc; ++i) {
-			len = strlen(argv[i]);
+		for(int i = 0; i < argc; ++i){
+			char *ptr = argv[i];
+			ssize_t len = strlen(argv[i]);
+			ssize_t len_written = 0;
 
-			if (ptr + len + 1 >= BUF_SIZE) {
-				len_to_be_written = ptr;
-
-				while (len_to_be_written > 0) {
-					int ret = write(pipefd[1], buf + ptr, len_to_be_written);
-					if (ret < 0) {
-						fprintf(stderr, "Ошибка вывода данных\n");
-						close(pipefd[1]);
-						exit(1);
-					}
-					len_to_be_written -= ret;
-					ptr += ret;
-				}
-
-				ptr = 0;
-			}
-
-			if (len > BUF_SIZE) {
-				int ret = write(pipefd[1], argv[i], len);
-				if (ret < 0) {
-					fprintf(stderr, "Ошибка вывода данных\n");
+			while(len_written < len){
+				ssize_t ret = write(pipefd[1], ptr + len_written, len);
+				if(ret < 0){
+					perror("Ошибка вывода данных\n");
 					close(pipefd[1]);
 					exit(1);
 				}
+				len_written += ret;
+				len -= ret;
 			}
-			else {
-				memmove(buf + ptr, argv[i], len);
-				ptr += len;
-			}
-			buf[ptr] = '\n';
-			ptr++;
-		}
-		if (ptr > 0) {
-			if (write(pipefd[1], buf, ptr) < 0) {
-				fprintf(stderr, "Ошибка вывода данных\n");
+			if (write(pipefd[1], "\n", 1) < 0) {
+				perror("Ошибка записи переноса строки\n");
 				close(pipefd[1]);
 				exit(1);
 			}
 		}
 
 		if (close(pipefd[1]) < 0) {
-			fprintf(stderr, "Ошибка закрытия пайпа\n");
-			close(pipefd[1]);
+			perror("Ошибка закрытия пайпа\n");
 			exit(1);
 		}
 
-		wait(0);
+		int ret = wait(0);
+		if( ret < 0){
+			perror("Ошибка wait\n");
+			exit(1);
+		}
+
 		exit(0);
 	}
 }

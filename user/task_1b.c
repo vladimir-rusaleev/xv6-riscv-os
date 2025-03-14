@@ -21,7 +21,12 @@ int main(){
 		}
 
 		int status_code;
-		wait(&status_code);
+		int ret = wait(&status_code);
+		if( ret < 0){
+			fprintf(2, "Ошибка Wait\n");
+			exit(1);
+		}
+
 		printf("Процесс с идентификатором %d был остановлен с кодом возврата %d\n", pid, status_code);
 
 		exit(0);	

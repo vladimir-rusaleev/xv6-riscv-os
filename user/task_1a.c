@@ -16,9 +16,13 @@ int main(){
 		int parent_pid = getpid();
 		printf("pid родителя = %d, pid ребенка = %d\n", parent_pid, pid);
 		int status_code;
-		wait(&status_code);
-		printf("Процесс с идентификатором %d завершился с кодом возврата %d\n", pid, status_code);
+		int ret = wait(&status_code);
+		if( ret < 0){
+			fprintf(2, "Ошибка wait\n");
+			exit(1);
+		}
 
+		printf("Процесс с идентификатором %d завершился с кодом возврата %d\n", pid, status_code);
 		exit(0);
 	}
 }
