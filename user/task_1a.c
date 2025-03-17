@@ -1,0 +1,28 @@
+#include "kernel/types.h"
+#include "kernel/stat.h"
+#include "user/user.h"
+
+int main(){
+	int pid = fork();
+	if(pid < 0){
+		fprintf(2, "Ошибка при создании процесса\n");
+		exit(1);
+        }
+	if(pid == 0){
+		sleep(100);
+		exit(1);
+	}
+	else{
+		int parent_pid = getpid();
+		printf("pid родителя = %d, pid ребенка = %d\n", parent_pid, pid);
+		int status_code;
+		int ret = wait(&status_code);
+		if( ret < 0){
+			fprintf(2, "Ошибка wait\n");
+			exit(1);
+		}
+
+		printf("Процесс с идентификатором %d завершился с кодом возврата %d\n", pid, status_code);
+		exit(0);
+	}
+}
