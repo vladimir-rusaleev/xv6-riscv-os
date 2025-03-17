@@ -1,4 +1,4 @@
-enum procinfo_states { PROCINFO_USED, PROCINFO_SLEEPING, PROCINFO_RUNNABLE, 
+enum procinfo_states { PROCINFO_SLEEPING, PROCINFO_RUNNABLE, 
 	PROCINFO_RUNNING, PROCINFO_ZOMBIE };
 
 struct procinfo {
@@ -6,4 +6,5 @@ struct procinfo {
 	char proc_name[16];
 	enum procinfo_states state;
 	int parent_pid;
+	char parent_name[16];
 };

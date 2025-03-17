@@ -703,7 +703,7 @@ int ps_listinfo(struct procinfo* plist, int lim) {
 	for(p = proc; p < &proc[NPROC]; p++) {
 		acquire(&p->lock);
 		
-		if(p->state == UNUSED) {
+		if(p->state == UNUSED || p->state == USED) {
 			release(&p->lock);
 			continue;
 		}
@@ -721,15 +721,24 @@ int ps_listinfo(struct procinfo* plist, int lim) {
 		}
 
 		prc.pid = p->pid;
-		prc.state = p->state;
-		strncpy(prc.proc_name, p->name, strlen(p->name));
+
+		if(p->state == RUNNING) prc.state = PROCINFO_RUNNING;
+		else if(p->state == RUNNABLE) prc.state = PROCINFO_RUNNABLE;
+		else if(p->state == SLEEPING) prc.state = PROCINFO_SLEEPING;
+		else prc.state = PROCINFO_ZOMBIE;
+
+		strncpy(prc.proc_name, p->name, sizeof(prc.proc_name));
 
 		acquire(&wait_lock);
 
-		if(p->parent)
+		if(p->parent) {
 			prc.parent_pid = p->parent->pid;
-		else
+			strncpy(prc.parent_name, p->parent->name, sizeof(prc.parent_name));
+		}
+		else {
 			prc.parent_pid = 0;
+			prc.parent_name[0] = '\0';
+		}
 
 		release(&wait_lock);
 		
