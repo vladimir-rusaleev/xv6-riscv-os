@@ -49,8 +49,6 @@ int mutexclose(struct file *f) {
 		printf("Ошибка: кажется это не мьютекс\n");
 		return -1;
 	}
-	if(holdingsleep(f->mutex->sl_lock) && f->mutex->sl_lock->pid == myproc()->pid)
-		releasesleep(f->mutex->sl_lock);
 
 	kfree((char *)f->mutex->sl_lock);
 	kfree((char *)f->mutex);
