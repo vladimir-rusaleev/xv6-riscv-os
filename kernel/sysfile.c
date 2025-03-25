@@ -15,7 +15,7 @@
 #include "sleeplock.h"
 #include "file.h"
 #include "fcntl.h"
-
+#include "mutex.h"
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
 static int
@@ -502,4 +502,62 @@ sys_pipe(void)
     return -1;
   }
   return 0;
+}
+
+uint64 sys_mutex_create(void) {
+	struct file *f;
+	int fd;
+
+        if(mutexalloc(&f) < 0)
+		return -1;
+	if(!f)
+		return -1;
+
+	fd = fdalloc(f);
+	if(fd < 0) {
+		fileclose(f);
+		return -1;
+	}
+	return fd;
+}
+
+uint64 sys_mutex_lock(void) {
+        int fd;
+        struct file *f;
+
+        argfd(0, &fd, &f);
+
+        if( !f || f->type != FD_MUTEX || !(f->mutex) || f->ref < 1)
+                return -1;
+
+        acquiresleep(f->mutex->sl_lock);
+        return 0;
+}
+
+uint64 sys_mutex_unlock(void) {
+        int fd;
+        struct file *f;
+
+        argfd(0, &fd, &f);
+
+        if(f->type != FD_MUTEX || !(f->mutex)
+                || f->ref < 1
+                || !holdingsleep(f->mutex->sl_lock) )
+                return -1;
+
+        releasesleep(f->mutex->sl_lock);
+        return 0;
+}
+
+uint64 sys_mutex_close(void) {
+        int fd;
+        struct file *f;
+
+        argfd(0, &fd, &f);
+
+        if(f->type != FD_MUTEX)
+                return -1;
+
+        fileclose(f);
+        return 0;
 }
