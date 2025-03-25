@@ -732,8 +732,10 @@ int ps_listinfo(struct procinfo* plist, int lim) {
 		acquire(&wait_lock);
 
 		if(p->parent) {
+			acquire(&p->parent->lock);
 			prc.parent_pid = p->parent->pid;
 			strncpy(prc.parent_name, p->parent->name, sizeof(prc.parent_name));
+			release(&p->parent->lock);
 		}
 		else {
 			prc.parent_pid = 0;
