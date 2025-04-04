@@ -23,4 +23,3 @@
 #define SYS_mutex_create	22
 #define SYS_mutex_lock	23
 #define SYS_mutex_unlock	24
-#define SYS_mutex_close	25

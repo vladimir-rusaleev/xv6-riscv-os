@@ -530,7 +530,7 @@ uint64 sys_mutex_lock(void) {
         if( !f || f->type != FD_MUTEX || !(f->mutex) || f->ref < 1)
                 return -1;
 
-        acquiresleep(f->mutex->sl_lock);
+        acquiresleep(&f->mutex->sl_lock);
         return 0;
 }
 
@@ -542,22 +542,9 @@ uint64 sys_mutex_unlock(void) {
 
         if(f->type != FD_MUTEX || !(f->mutex)
                 || f->ref < 1
-                || !holdingsleep(f->mutex->sl_lock) )
+                || !holdingsleep(&f->mutex->sl_lock) )
                 return -1;
 
-        releasesleep(f->mutex->sl_lock);
-        return 0;
-}
-
-uint64 sys_mutex_close(void) {
-        int fd;
-        struct file *f;
-
-        argfd(0, &fd, &f);
-
-        if(f->type != FD_MUTEX)
-                return -1;
-
-        fileclose(f);
+        releasesleep(&f->mutex->sl_lock);
         return 0;
 }

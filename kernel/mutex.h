@@ -1,3 +1,3 @@
 struct mutex {
-	struct sleeplock* sl_lock;
+	struct sleeplock sl_lock;
 };
