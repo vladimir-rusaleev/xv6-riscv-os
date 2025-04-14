@@ -33,7 +33,7 @@ void print_pagetable(pagetable_t pagetable, int level, uint64 buf_st, int len, i
     else
         pte = &pagetable[(rounded_buf / sizeof_block) % 512];
 
-    int flag_validation = (((flags == A_FLAG) && (*pte & PTE_A)) || ((flags == D_FLAG) && (*pte & PTE_D)) || (flags == ALL_FLAGS));
+    int flag_validation = (((flags == A_FLAG) && (*pte & PTE_A)) || ((flags == D_FLAG) && (*pte & PTE_D)) || (flags == AD_FLAGS));
 
     if ((*pte & PTE_V) && (level > 0 || flag_validation)){
         printf("%s", prefixes[level]);
@@ -105,14 +105,14 @@ void delete_flags(pagetable_t pagetable, int level, uint64 buf_st, int len, int 
     else
         pte = &pagetable[(rounded_buf / sizeof_block) % 512];
 
-    int flag_validation = (((flags == A_FLAG) && (*pte & PTE_A)) || ((flags == D_FLAG) && (*pte & PTE_D)) || (flags == ALL_FLAGS));
+    int flag_validation = (((flags == A_FLAG) && (*pte & PTE_A)) || ((flags == D_FLAG) && (*pte & PTE_D)) || (flags == AD_FLAGS));
 
     if ((*pte & PTE_V) && (level > 0 || flag_validation)){
         if(flags == A_FLAG)
             *pte &= ~PTE_A;
         else if(flags == D_FLAG)
             *pte &= ~PTE_D;
-        else if(flags == ALL_FLAGS) {
+        else if(flags == AD_FLAGS) {
             *pte &= ~PTE_A;
             *pte &= ~PTE_D;
         }
