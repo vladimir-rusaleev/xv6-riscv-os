@@ -109,6 +109,11 @@ int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 
+//  rtc.c
+uint32          rtc_read_low(void);
+uint32          rtc_read_high(void);
+uint64          rtc_read_time(void);
+
 // swtch.S
 void            swtch(struct context*, struct context*);
 
