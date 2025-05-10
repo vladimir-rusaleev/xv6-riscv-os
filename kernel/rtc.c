@@ -2,9 +2,17 @@
 #include "memlayout.h"
 #include "riscv.h"
 #include "defs.h"
+#include "rtc.h"
+
+static struct spinlock rtc_lock;
 
 static volatile uint32* rtc_low = (volatile uint32*) RTC_LOW;
 static volatile uint32* rtc_high = (volatile uint32*) RTC_HIGH;
+
+void rtc_init(void)
+{
+    initlock(&rtc_lock, "rtc");
+}
 
 uint32 rtc_read_low(void)
 {
@@ -18,7 +26,11 @@ uint32 rtc_read_high(void)
 
 uint64 rtc_read_time(void)
 {
+    acquire(&rtc_lock);
     uint32 low = rtc_read_low();
     uint32 high = rtc_read_high();
-    return ((uint64)high << 32) | low;
+    uint64 time = ((uint64)high << 32) | low;
+    release(&rtc_lock);
+
+    return time;
 }
