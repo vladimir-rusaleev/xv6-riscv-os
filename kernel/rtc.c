@@ -4,7 +4,7 @@
 #include "defs.h"
 #include "rtc.h"
 
-static struct spinlock rtc_lock;
+struct spinlock rtc_lock;
 
 static volatile uint32* rtc_low = (volatile uint32*) RTC_LOW;
 static volatile uint32* rtc_high = (volatile uint32*) RTC_HIGH;
