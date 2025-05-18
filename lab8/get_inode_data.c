@@ -38,7 +38,6 @@ struct ext2_super_block {
     uint16_t s_def_resuid;
     uint16_t s_def_resgid;
 
-    // EXT2_DYNAMIC_REV (rev_level >= 1) fields:
     uint32_t s_first_ino;
     uint16_t s_inode_size;
     uint16_t s_block_group_nr;
@@ -50,12 +49,10 @@ struct ext2_super_block {
     char     s_last_mounted[64];
     uint32_t s_algorithm_usage_bitmap;
 
-    // Performance hints
     uint8_t  s_prealloc_blocks;
     uint8_t  s_prealloc_dir_blocks;
     uint16_t s_padding1;
 
-    // Journaling support (not used in ext2 but present)
     uint8_t  s_journal_uuid[16];
     uint32_t s_journal_inum;
     uint32_t s_journal_dev;
@@ -70,8 +67,8 @@ struct ext2_super_block {
     uint32_t s_first_meta_bg;
     uint32_t s_mkfs_time;
 
-    uint32_t s_jnl_blocks[17];  // Usually unused in ext2
-    uint32_t s_reserved[172];   // Pad to 1024 bytes
+    uint32_t s_jnl_blocks[17];
+    uint32_t s_reserved[172];
 } __attribute__((packed));
 
 struct ext2_group_desc {
